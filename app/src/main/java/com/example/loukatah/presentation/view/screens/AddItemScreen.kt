@@ -10,9 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -30,14 +29,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.BeyondBoundsLayout
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-
+import com.example.loukatah.presentation.viewmodel.AddItemEvent
 import com.example.loukatah.presentation.viewmodel.AddItemViewModel
 import com.example.loukatah.presentation.viewmodel.ItemCategoryViewModel
 
-import com.example.loukatah.presentation.viewmodel.AddItemViewModel.AddItemEvent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,13 +52,34 @@ fun AddItemScreen(
     itemCategoryViewModel: ItemCategoryViewModel = hiltViewModel(),
     addItemViewModel: AddItemViewModel = hiltViewModel()
 ) {
-    val uiState by addItemViewModel.uiState.collectAsState()
+    // State
+    //--status
+    var statusIsExpanded by remember { mutableStateOf(false) };
+    var status by remember { mutableStateOf("Lost") }
+    //--title
+    var title by remember { mutableStateOf("") }
+    //--description
+    var description by remember { mutableStateOf("") }
+    //--image url
+    var imageUrl by remember { mutableStateOf("") }
+    //--category
+    var categoryIsExpanded by remember { mutableStateOf(false) };
+    var categoryValue by remember { mutableStateOf("") }
     val categoryState by itemCategoryViewModel.categoryState.collectAsState()
     val categories = categoryState.categories
-
-    var isCategoryDropdownExpanded by remember { mutableStateOf(false) }
-    var expandedStatus by remember { mutableStateOf(false) }
-
+    //--uistate
+    val uiState by addItemViewModel.uiState.collectAsState()
+    // Events
+    //--title
+    addItemViewModel.onEvent(AddItemEvent.TitleChange(title))
+    //--description
+    addItemViewModel.onEvent(AddItemEvent.DescriptionChange(description))
+    //--category
+    addItemViewModel.onEvent(AddItemEvent.CategoryChange(categoryValue))
+    //--status
+    addItemViewModel.onEvent(AddItemEvent.StatusChange(status))
+    //--image url
+    addItemViewModel.onEvent(AddItemEvent.PictureChange(imageUrl))
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
@@ -63,8 +88,7 @@ fun AddItemScreen(
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
-
+                            imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Back"
                         )
                     }
@@ -83,115 +107,149 @@ fun AddItemScreen(
                     .verticalScroll(rememberScrollState())
                     .padding(16.dp)
             ) {
+                // Title
                 OutlinedTextField(
-                    value = uiState.title,
-                    onValueChange = { addItemViewModel.onEvent(AddItemEvent.TitleChange(it)) },
+                    value = title,//TODO() ,
+                    onValueChange = { title = it},//TODO() ,
                     label = { Text("Title") },
+                    textStyle = TextStyle(textAlign = TextAlign.Right),
                     modifier = Modifier.fillMaxWidth()
                 )
+                if(uiState.inValidTitle){
+                    Text(text = "Title could not be blank " ,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.align(Alignment.Start)
+                    )
+                }
+
                 Spacer(modifier = Modifier.height(16.dp))
+
+                // Description
                 OutlinedTextField(
-                    value = uiState.description,
-                    onValueChange = { addItemViewModel.onEvent(AddItemEvent.DescriptionChange(it)) },
+                    value = description,//TODO() ,
+                    onValueChange = { description = it},//TODO() ,
                     label = { Text("Description") },
+                    textStyle = TextStyle(textAlign = TextAlign.Right),
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 3
                 )
+                if(uiState.inValidDesc){
+                    Text(text = "Description could not be blank " ,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.align(Alignment.Start)
+                    )
+                }
+
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // Status dropdown
                 ExposedDropdownMenuBox(
-                    expanded = expandedStatus,
-                    onExpandedChange = { expandedStatus = it },
+                    expanded = statusIsExpanded ,//TODO
+                    onExpandedChange = { statusIsExpanded = !statusIsExpanded }, //TODO
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     OutlinedTextField(
-                        value = uiState.status,
+                        value = status, //TODO
                         onValueChange = {},
                         readOnly = true,
                         label = { Text("Status") },
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedStatus) },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = statusIsExpanded, //TODO
+                        ) },
+                        textStyle = TextStyle(),
                         modifier = Modifier
                             .fillMaxWidth()
                             .menuAnchor()
                     )
+
                     ExposedDropdownMenu(
-                        expanded = expandedStatus,
-                        onDismissRequest = { expandedStatus = false }
+                        expanded = statusIsExpanded, //TODO
+                        onDismissRequest = { statusIsExpanded = false} ,//TODO
                     ) {
-                        listOf("Lost", "Found", "Returned").forEach { option ->
+                        listOf("Lost", "Found").forEach { option ->
                             DropdownMenuItem(
                                 text = { Text(text = option) },
                                 onClick = {
-                                    addItemViewModel.onEvent(AddItemEvent.StatusChange(option))
-                                    expandedStatus = false
+                                    status = option
+                                    statusIsExpanded = !statusIsExpanded
                                 }
                             )
                         }
                     }
                 }
+
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // Category dropdown
                 ExposedDropdownMenuBox(
-                    expanded = isCategoryDropdownExpanded,
-                    onExpandedChange = { isCategoryDropdownExpanded = it },
+                    expanded = categoryIsExpanded, //TODO
+                    onExpandedChange = { categoryIsExpanded = !categoryIsExpanded}, //TODO
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     OutlinedTextField(
-                        value = uiState.category,
+                        value =  categoryValue,
                         onValueChange = {},
                         readOnly = true,
                         label = { Text("Category") },
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isCategoryDropdownExpanded) },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = categoryIsExpanded) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .menuAnchor()
                     )
+
                     ExposedDropdownMenu(
-                        expanded = isCategoryDropdownExpanded,
-                        onDismissRequest = { isCategoryDropdownExpanded = false }
+                        expanded = categoryIsExpanded,//TODO
+                        onDismissRequest = { categoryIsExpanded = false} , //TODO
                     ) {
                         categories.forEach { category ->
                             DropdownMenuItem(
                                 text = { Text(text = category.name) },
                                 onClick = {
-                                    addItemViewModel.onEvent(AddItemEvent.CategoryChange(category.name))
-                                    isCategoryDropdownExpanded = false
+                                    //TODO
+                                    categoryValue = category.name
+                                    categoryIsExpanded = false
                                 }
                             )
                         }
                     }
                 }
-                Spacer(modifier = Modifier.height(16.dp))
-
+                if(uiState.inValidCategory){
+                    Text(text = "Please choose category " ,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.align(Alignment.Start)
+                    )
+                }
+                Spacer(modifier = Modifier.height(32.dp))
+                //Image url
                 OutlinedTextField(
-                    value = uiState.picture,
-                    onValueChange = { addItemViewModel.onEvent(AddItemEvent.PictureChange(it)) },
-                    label = { Text("Picture URL") },
+                    value = imageUrl,//TODO() ,
+                    onValueChange = {imageUrl = it },//TODO() ,
+                    label = { Text("Image url") },
                     modifier = Modifier.fillMaxWidth()
                 )
+                if(uiState.inValidPicureUrl){
+                    Text(text = "Picture url could only be a url form " ,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.align(Alignment.Start)
+                    )
+                }
                 Spacer(modifier = Modifier.height(32.dp))
 
-                if (uiState.error != null) {
-                    Text(text = uiState.error!!, color = MaterialTheme.colorScheme.error)
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-
+                // Submit button
                 Button(
-                    onClick = { addItemViewModel.onEvent(AddItemEvent.SaveItem) },
-                    enabled = uiState.title.isNotBlank() && uiState.description.isNotBlank() && uiState.status.isNotBlank() && uiState.category.isNotBlank(),
+                    onClick = {
+                        // In a real app, we would save the item here
+                        // For now, just call the callback
+                        addItemViewModel.onEvent(AddItemEvent.SaveItem)
+                        onItemAdded()
+                    },
+                    enabled = uiState.isEnable, // TODO
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    if (uiState.isLoading) {
-                        CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary)
-                    } else {
-                        Text(text = "Add Item")
-                    }
+                    Text(text = "Add Item")
                 }
-
-                if (uiState.isSuccess) {
-                    onItemAdded()
-                }
-            }
+                if(uiState.isLoading){
+                    Text(text = "Adding item...")
+                }            }
         }
     }
 }

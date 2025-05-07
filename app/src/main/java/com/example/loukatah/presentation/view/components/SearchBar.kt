@@ -24,6 +24,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import com.example.loukatah.presentation.viewmodel.AuthViewModel
 
 /**
  * Custom search bar component
@@ -40,7 +43,11 @@ fun SearchBar(
     onSearchQueryChange: (String) -> Unit,
     onClearClick: () -> Unit,
     onMenuClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    authViewModel: AuthViewModel = hiltViewModel()
+
+
 ) {
     BasicTextField(
         modifier = modifier

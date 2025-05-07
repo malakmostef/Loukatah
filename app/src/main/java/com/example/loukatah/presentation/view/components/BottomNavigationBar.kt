@@ -4,6 +4,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.AllInbox
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -15,9 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.loukatah.presentation.view.navigation.Screen
+import com.example.loukatah.presentation.viewmodel.AuthViewModel
 
 @Composable
-fun BottomNavigationBar(navController: NavController) {
+fun BottomNavigationBar(navController: NavController, authViewModel: AuthViewModel) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
@@ -48,6 +50,12 @@ fun BottomNavigationBar(navController: NavController) {
             onClick = { navController.navigate(Screen.Settings.route) },
             icon = { Icon(Icons.Filled.Settings, contentDescription = "الإعدادات") },
             label = { Text("الإعدادات") }
+        )
+        NavigationBarItem(
+            selected = currentRoute == Screen.Settings.route,
+            onClick = { authViewModel.signout() },
+            icon = { Icon(Icons.Filled.ExitToApp, contentDescription = "Sign out") },
+            label = { Text("Sign out") }
         )
     }
 }

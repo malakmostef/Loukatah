@@ -1,27 +1,24 @@
 package com.example.loukatah.data.repository
 
+import android.util.Log
 import com.example.loukatah.data.model.Item
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
+import java.util.Date
 import javax.inject.Inject
-
-
-class ItemRepositoryImpl @Inject constructor(
-    firestore: FirebaseFirestore, auth: FirebaseAuth,
-    override val firebaseAuth: FirebaseAuth
-) : ItemRepository {
+class ItemRepositoryFirebase @Inject constructor() : ItemRepository {
     private val itemsCollection = Firebase.firestore.collection("items")
-
     // Flow for emitting items
     private val _itemsFlow = MutableSharedFlow<List<Item>>(replay = 1)
 
@@ -41,7 +38,7 @@ class ItemRepositoryImpl @Inject constructor(
             }
 
             val itemsList = snapshot?.documents?.mapNotNull { doc ->
-                doc.data?.let { Item.fromMap(it, doc.id) }
+                doc.data?.let { Item.fromMap(it,doc.id) }
             } ?: emptyList()
 
             CoroutineScope(Dispatchers.IO).launch {
@@ -80,11 +77,9 @@ class ItemRepositoryImpl @Inject constructor(
             throw e
         }
     }
-
     override fun getItemById(itemId: String): Flow<Item?> = callbackFlow {
     }
 
-    override fun searchItems(query: String, category: String?, status: String?): Flow<List<Item>> =
-        callbackFlow {
-        }
+    override fun searchItems(query: String, category: String?, status: String?): Flow<List<Item>> = callbackFlow {
+    }
 }

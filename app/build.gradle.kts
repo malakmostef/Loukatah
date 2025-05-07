@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.dagger.hilt.plugin)
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.serialization)
-    //alias(libs.plugins.google.services)
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -67,10 +67,14 @@ dependencies {
 
     //firebase
 
-//    implementation(platform(libs.google.firebase.bom))
-//    implementation(libs.google.firebase.analytics.ktx)
-//    implementation(libs.google.firebase.auth.ktx)
-//    implementation(libs.google.firebase.firestore.ktx)
+    implementation(platform(libs.google.firebase.bom))
+    implementation(libs.google.firebase.analytics.ktx)
+    implementation(libs.google.firebase.auth.ktx)
+    implementation(libs.google.firebase.firestore.ktx)
+    implementation("com.google.firebase:firebase-auth-ktx:22.1.2")
+    implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-database:20.3.")  // Firebase Realtime Database
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
@@ -88,5 +92,17 @@ dependencies {
     // Extended Icons
     implementation(libs.androidx.compose.material.icons.extended)
 
+    implementation("androidx.compose.runtime:runtime-livedata:1.7.8")
+// Supa base
+    implementation ("io.github.jan-tennert.supabase:storage-kt:1.4.0")
+    implementation ("io.github.jan-tennert.supabase:postgrest-kt:1.4.0")
+    implementation ("io.ktor:ktor-client-okhttp:2.3.4")
 
+    // لاختيار الصور من المعرض
+    implementation ("com.github.dhaval2404:imagepicker:2.1")
+    implementation ("com.github.dhaval2404:imagepicker:2.1")
+    implementation ("io.coil-kt:coil-compose:2.4.0")
+    implementation ("androidx.activity:activity-ktx:1.7.0")
+    implementation ("androidx.fragment:fragment-ktx:1.5.7")
+    implementation ("com.github.dhaval2404:imagepicker:2.1")
 }

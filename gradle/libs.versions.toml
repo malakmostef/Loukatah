@@ -51,8 +51,6 @@ dagger-hilt-compiler = {group = "com.google.dagger", name = "hilt-android-compil
 androidx-hilt-navigation-compose = {group="androidx.hilt",name = "hilt-navigation-compose", version.ref = "hiltNavigation"}
 androidx-navigation-compose = { group="androidx.navigation",name="navigation-compose",version.ref = "navigationCompose"}
 
-androidx-hilt-navigatin-compose = { group = "androidx.hilt", name = "hilt-navigatin-compose", version.ref = "hiltNavigation" }
-androidx-navigatin-compose = { group = "androidx.navigatin", name = "navigatin-compose", version.ref = "navigationCompose" }
 
 google-firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase" }
 google-firebase-analytics-ktx = { group = "com.google.firebase", name = "firebase-analytics-ktx" ,version.ref = "analytics"}

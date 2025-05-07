@@ -4,4 +4,12 @@ import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
-class LoukatahApp:Application()
+class LoukatahApp:Application() {
+    override fun onCreate() {
+        super.onCreate()
+        val Firebase = null
+        Firebase.initialize(this)
+    }
+}
+
+private fun Nothing?.initialize(app: LoukatahApp) {}
